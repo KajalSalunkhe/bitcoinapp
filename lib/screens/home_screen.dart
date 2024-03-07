@@ -1,4 +1,5 @@
 import 'package:bitcoinapp/bloc/currency_bloc.dart';
+import 'package:bitcoinapp/model/currency_data_model.dart';
 import 'package:bitcoinapp/widget/currency_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +25,7 @@ class HomeScreenContent extends StatefulWidget {
 
 class _HomeScreenContentState extends State<HomeScreenContent> {
   String? _selectedCurrency;
+
   final currencies = [
     '',
     'EUR',
@@ -54,12 +56,12 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
           return const Center(child: CircularProgressIndicator());
         } else if (state is CurrencyLoadedState) {
           final currencyData = state.currencyData;
-          final currencyBpi = currencyData['bpi'];
-
+          final currencyBpi = currencyData.bpi;
+        
           final price =
               _selectedCurrency == null || _selectedCurrency == currencies.first
                   ? "Price"
-                  : currencyBpi[_selectedCurrency!]['rate'] ?? "Price";
+                  : _getRate(currencyBpi, _selectedCurrency!);
           return Container(
             color: Color(0xFF04929B),
             child: Column(
@@ -100,5 +102,18 @@ class _HomeScreenContentState extends State<HomeScreenContent> {
         return Container();
       },
     );
+  }
+}
+
+String _getRate(Bpi? bpi, String currencyCode) {
+  switch (currencyCode) {
+    case 'USD':
+      return bpi?.uSD?.rate ?? "Price";
+    case 'GBP':
+      return bpi?.gBP?.rate ?? "Price";
+    case 'EUR':
+      return bpi?.eUR?.rate ?? "Price";
+    default:
+      return "Price";
   }
 }
